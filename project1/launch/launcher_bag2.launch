@@ -1,0 +1,26 @@
+<launch>
+
+
+	<param name="use_sim_time" value="true"/>
+
+	<param name="initial_pose_x" value="-2.81132697617
+" />
+	<param name="initial_pose_y" value="0.784711979093
+" />
+	<param name="initial_pose_theta" value="0.0438853345029
+" />
+
+	<node pkg="final_pkg" type="pub_velocities" name="pub_velocities" />
+	<node pkg="final_pkg" type="pub_odometry" name="pub_odometry"/>
+
+	<node pkg="tf" type="static_transform_publisher" name="world_odom_transform_broadcaster" args="
+    -0.486400455236
+ 0.442696422338
+ 0.577918827534
+ -0.0571999251842
+ -0.168516501784
+ 0.84076499939
+ -0.511316657066
+ world odom 100" />
+
+</launch>

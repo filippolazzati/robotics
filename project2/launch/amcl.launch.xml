@@ -1,0 +1,62 @@
+<launch>
+  <arg name="use_map_topic"   default="true"/> <!-- When set to true, AMCL will subscribe to the map topic rather than making a service call to receive its map -->
+  <arg name="scan_topic"      default="scan"/> <!-- -->
+
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/> <!-- With the values coming from the optitrack at initial time in calib.bag (change them) -->
+  <arg name="initial_pose_a" default="0.0"/>
+
+  <arg name="odom_frame_id"   default="odom"/> 
+  <arg name="base_frame_id"   default="base_link"/> <!-- -->
+  <arg name="global_frame_id" default="map"/> <!-- I use the map built with gmapping-->
+
+  <node pkg="amcl" type="amcl" name="amcl"> <!-- run amcl -->
+    <param name="use_map_topic"             value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="diff"/> <!-- We have to try it. See the motion model in the book -->
+    <param name="gui_publish_rate"          value="10.0"/> <!-- -->
+    <param name="laser_max_beams"             value="540"/> <!-- I use the maximum value admissible from the laser: from the /scan topic I read:
+angle_min=-2.35619449615  angle_max=2.35619449615 angle_increment=0.00872664619237, therefore we have: 540 different beams
+This parameter describes how many beams will be used to calculate the likelihood during the update step. Therefore, every i-th beam will be used, where i is denoted by the quotient of maximum number of beams and the count of used beams. If the count of used beams is too high, the real time constraint is not fulfilled. //maybe is better to decrease it-->
+    <param name="laser_max_range"           value="20.0"/> <!-- 20 metres because it is the value read in the datasheet -->
+
+    <param name="min_particles"             value="500"/> <!-- default value -->
+    <param name="max_particles"             value="5000"/> <!-- default value -->
+
+    <param name="kld_err"                   value="0.05"/> <!-- -->
+    <param name="kld_z"                     value="0.99"/> <!-- -->
+    <param name="odom_alpha1"               value="0.2"/> <!-- prof value-->
+    <param name="odom_alpha2"               value="0.2"/> <!-- prof value -->
+    <param name="odom_alpha3"               value="0.2"/> <!-- prof value -->
+    <param name="odom_alpha4"               value="0.2"/> <!-- prof value -->
+    <param name="odom_alpha5"               value="0.1"/> <!--prof value -->
+
+    <param name="laser_z_hit"               value="0.95"/> <!-- -->
+    <param name="laser_z_short"             value="0.1"/> <!-- -->
+    <param name="laser_z_max"               value="0.05"/> <!-- I have used only default values-->
+    <param name="laser_z_rand"              value="0.05"/> <!-- -->
+    <param name="laser_sigma_hit"           value="0.2"/> <!-- -->
+    <param name="laser_lambda_short"        value="0.1"/> <!-- -->
+
+    <param name="laser_model_type"          value="likelihood_field"/> <!-- default -->
+    <param name="laser_likelihood_max_dist" value="2.0"/> <!-- default -->
+
+    <param name="update_min_a"              value="0.20"/> <!-- default -->
+    <param name="update_min_d"              value="0.1"/> <!-- I low the value if there is too much drift; I have to test it with the odometry; for the project probably I will need a value lower than 0.2 (the default)-->
+
+    <param name="odom_frame_id"             value="$(arg odom_frame_id)"/>  <!-- -->
+    <param name="base_frame_id"             value="$(arg base_frame_id)"/>  <!-- -->
+    <param name="global_frame_id"           value="$(arg global_frame_id)"/> <!-- -->
+ 
+   <param name="resample_interval"         value="2"/> <!-- If the system is not loaded I want to resample more -> I use 2 (prof used 1) -->
+    <param name="transform_tolerance"       value="1.0"/> <!-- I set 1.0secs instead of 0.1secs (the default value) because if the system is too loaded, then it will use the tf values anyway-->
+
+    <param name="recovery_alpha_slow"       value="0.0"/> <!-- 0.0 means disabled (there is a good value on the doc) -->
+    <param name="recovery_alpha_fast"       value="0.0"/> <!-- 0.0 means disabled (there is a good value on the doc) -->
+
+    <param name="initial_pose_x"            value="$(arg initial_pose_x)"/> <!-- -->
+    <param name="initial_pose_y"            value="$(arg initial_pose_y)"/> <!-- -->
+    <param name="initial_pose_a"            value="$(arg initial_pose_a)"/> <!-- -->
+    <remap from="scan"                      to="$(arg scan_topic)"/> <!-- -->
+  </node>
+</launch>

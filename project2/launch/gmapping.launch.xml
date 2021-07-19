@@ -1,0 +1,46 @@
+<launch>
+  <!-- I define the topic from which gmapping will read lidar's values and I specify the frames for the robot and its odom -->
+  <arg name="scan_topic"  default="scan" /> 
+  <arg name="base_frame"  default="base_link"/>
+  <arg name="odom_frame"  default="odom"/>
+
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+    <param name="base_frame" value="$(arg base_frame)"/>
+    <param name="odom_frame" value="$(arg odom_frame)"/>
+    <param name="map_update_interval" value="1.0"/> <!-- value of prof -->
+    <param name="maxUrange" value="18"/> <!-- I use the value from the datasheet; I set it less than maxRange to make gmapping understand this area as free space (and not unknown). The 18 metres value is taken from the datasheet and is the scanning range for objects up to
+10 % of remission (59.06 ft) -->
+    <param name="maxRange" value="20"/> <!-- Maximum range measurable by the robot -->
+    <param name="sigma" value="0.05"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="kernelSize" value="1"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="lstep" value="0.05"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="astep" value="0.05"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="iterations" value="10"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="lsigma" value="0.075"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="ogain" value="3.0"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="lskip" value="0"/> <!-- Default - If the laser is well-set, then it  will work fine -->
+    <param name="minimumScore" value="0"/> <!-- Default; I have to try 50 if I experience jumping estimates issues -->
+    <param name="srr" value="0.01"/> <!-- Default because I do not have this data -->
+    <param name="srt" value="0.02"/> <!-- Default because I do not have this data -->
+    <param name="str" value="0.01"/> <!-- Default because I do not have this data -->
+    <param name="stt" value="0.02"/> <!-- Default because I do not have this data -->
+    <param name="linearUpdate" value="0.01"/> <!-- Default -->
+    <param name="angularUpdate" value="0.01"/> <!-- Default -->
+    <param name="temporalUpdate" value="-1.0"/> <!-- Default = not used -->
+    <param name="resampleThreshold" value="0.5"/> <!-- default -->
+    <param name="particles" value="80"/> <!-- default -->
+
+    <param name="xmin" value="-20.0"/> <!-- 20 because the lidar maxRange is 20 metres-->
+    <param name="ymin" value="-20.0"/> <!-- -->
+    <param name="xmax" value="20.0"/> <!-- -->
+    <param name="ymax" value="20.0"/> <!-- -->
+
+    <param name="delta" value="0.05"/> <!-- default (Resolution of the map (in metres per occupancy grid block)) -->
+    <param name="llsamplerange" value="0.01"/> <!-- -->
+    <param name="llsamplestep" value="0.01"/> <!-- -->
+    <param name="lasamplerange" value="0.005"/> <!-- -->
+    <param name="lasamplestep" value="0.005"/> <!-- -->
+    <remap from="scan" to="$(arg scan_topic)"/> <!-- -->
+  </node>
+
+</launch>
